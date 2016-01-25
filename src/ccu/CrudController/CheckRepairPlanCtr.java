@@ -42,7 +42,7 @@ public class CheckRepairPlanCtr {
     PlanExamRepo planExamRepo;
 
     /**
-     * 根据  地区 id 状态 和  为修部门   查询维修申请信息
+     * 根据  地区 id 状态 和  为修部门   查询     维修申请信息
      * 输入数据: areaId  step  repairDepartmentId
      * 输出数据：repairApp 对象的josn 窜
      * @param str
@@ -58,9 +58,9 @@ public class CheckRepairPlanCtr {
     }
 
     /**
-     * 根据申请 ID 和 类型 查询维修申请方案
+     * 根据申请 ID 和 类型 查询             维修申请方案
      * 输入数据：appId  planType
-     * 输出数据：返回的是该申请单的最新的维修方案
+     * 输出数据：返回的是  该申请单的   最新的维修方案
      * @param str
      * @return
      * @throws JsonProcessingException
@@ -103,7 +103,7 @@ public class CheckRepairPlanCtr {
     }
 
     /**
-     * 根据 appcode 和planId  查询 待审核的维保方案
+     * 根据 appcode 和planId  查询 待审核的    维保方案
      * 输入数据： appCode  planId
      * 输出数据： 待审核方案
      * 操作：根据repairApp 查询相关的planId

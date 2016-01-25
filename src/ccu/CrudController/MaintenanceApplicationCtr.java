@@ -153,7 +153,4 @@ public class MaintenanceApplicationCtr {
         return JSON.toJSONString(machineInfo);
     }
 
-
-
-
 }

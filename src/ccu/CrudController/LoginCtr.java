@@ -69,10 +69,9 @@ public class LoginCtr {
         } catch (Exception e){
             e.printStackTrace();
         }
-        System.out.println("shi zhe de cuo wu ");
         if(user1 == null)
         {
-            System.out.println("    null");
+            System.out.println("该用户不存在！");
             return "null";
         }
         else
@@ -173,7 +172,6 @@ public class LoginCtr {
         }catch (Exception e){
             e.printStackTrace();
         }
-
         System.out.println(userReRole.getRoleId());
         Role role =null;
         try {
@@ -181,16 +179,14 @@ public class LoginCtr {
         }catch (Exception e){
             e.printStackTrace();
         }
-        System.out.println("         "+role.getRoleName());
+        System.out.println("该用户的角色名："+role.getRoleName());
         return role.getRoleName();
     }
 
 
     @RequestMapping(value = "getUserInfos" ,method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
     public String getUserInfos(@RequestBody String str) throws  JsonProcessingException{
-
         UserInfo userInfo = userInfoRepo.findOne(str);
-
         return userInfo.getUserName();
 
     }

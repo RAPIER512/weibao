@@ -37,31 +37,29 @@ public class AreaMessageCtr {
 
     @RequestMapping(value = "getAreaInfos",method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
     public String getAreaInfos(@RequestBody String str )throws JsonProcessingException{
-        System.out.println("kaishi ");
         JSONObject jsonObject = JSON.parseObject(str);
         List<AreaInfo> list = new ArrayList<AreaInfo>();
         //普通用户
-        System.out.println("dd0      "+jsonObject.getInteger("flag"));
         if(jsonObject.getInteger("flag")==0)
         {
             UserInfo userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
             AreaInfo areaInfo = areaInfoRepo.findOne(userInfo.getAreaId());
             list.add(areaInfo);
-            System.out.println("dd1     "+list);
+            System.out.println("普通用户     查询结果："+list);
         }
         //维保用户
         else if(jsonObject.getInteger("flag")==1)
         {
             UserInfo userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
             list = areaInfoRepo.findByRepairDepartmentId(userInfo.getRepairDepartmentId());
-            System.out.println("dd2     "+list);
+            System.out.println("维保用户    查询结果： "+list);
         }
         //监管用户
         else if(jsonObject.getInteger("flag")==2)
         {
             UserInfo userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
             list = areaInfoRepo.findByAreaManageId(userInfo.getAreaManageId());
-            System.out.println("dd3    "+list);
+            System.out.println("监管用户    查询结果： "+list);
         }
         else{
             return "flag输入有误";
