@@ -1,15 +1,22 @@
 package ccu.CrudController;
 
+import ccu.model.basicData.AreaInfo;
 import ccu.model.business.PlanExam;
 import ccu.model.business.RepairApp;
 import ccu.model.business.RepairPlan;
 import ccu.springDataDao.business.PlanExamRepo;
 import ccu.springDataDao.business.RepairAppRepo;
 import ccu.springDataDao.business.RepairPlanRepo;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +24,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +65,32 @@ public class CheckRepairPlanCtr {
     @RequestMapping(value = "getAllRepairApp",method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
     public String getAllRepairApp(@RequestBody String str)throws JsonProcessingException
     {
+    	int pageNum = 0;
+		int pageSize = 0;
         JSONObject jsonObject = JSON.parseObject(str);
-        List<RepairApp> repairApp=repairAppRepo.findByAreaIdAndStepAndRepairDepartmentId(jsonObject.getString("areaId"), jsonObject.getInteger("step"), jsonObject.getString("repairDepartmentId"));
-        return JSON.toJSONString(repairApp);
+        final String areaId =jsonObject.getString("areaId"); 
+        final int step =jsonObject.getInteger("step"); 
+        final String repairDepartmentId = jsonObject.getString("repairDepartmentId");
+		pageNum = jsonObject.getIntValue("pageNum");
+		pageSize = jsonObject.getIntValue("pageSize");
+        List<RepairApp> list = new ArrayList<RepairApp>();
+        Specification<RepairApp> specification = new Specification<RepairApp>() {
+        	public Predicate toPredicate(Root<RepairApp> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				
+				Path path = root.get("areaId");
+				Path path1 = root.get("step");
+				Path path2 = root.get("repairDepartmentId");
+				query.where(cb.equal(path, areaId),cb.equal(path1, step),cb.equal(path2, repairDepartmentId));
+				return null;
+			}
+		};
+        
+        Pageable pageable = new PageRequest(pageNum,pageSize);
+        Page<RepairApp> page=repairAppRepo.findAll(specification,pageable);
+        list = page.getContent();
+        list.get(0).setTheNextPage(page.hasNextPage());
+        return JSON.toJSONString(list);
     }
 
     /**
@@ -112,7 +148,7 @@ public class CheckRepairPlanCtr {
     public String getRepairPlanByAppCodeAndPlanId(@RequestBody String str)
     {
         JSONObject jsonObject = JSON.parseObject(str);
-        System.out.println(jsonObject.getString("appcode")+"    "+jsonObject.getString("planid"));
+        System.out.println("接收到的数据是："+jsonObject.getString("appcode")+"    "+jsonObject.getString("planid"));
         RepairPlan repairPlan = repairPlanRepo.findByAppCodeAndId(jsonObject.getString("appcode"), jsonObject.getString("planid"));
         return JSON.toJSONString(repairPlan);
     }

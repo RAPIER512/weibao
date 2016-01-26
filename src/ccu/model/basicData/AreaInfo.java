@@ -67,6 +67,8 @@ public class AreaInfo implements Serializable{
 //
 //    @OneToMany(targetEntity = RepairApp.class,fetch = FetchType.EAGER)
 //    private Set<RepairApp> repairApps = new HashSet<RepairApp>();//维修单（1对多）
+    
+    
 
     public AreaInfo() {
     }
@@ -215,4 +217,5 @@ public class AreaInfo implements Serializable{
     public void setRepairDepartmentId(String repairDepartmentId) {
         this.repairDepartmentId = repairDepartmentId;
     }
+    
 }

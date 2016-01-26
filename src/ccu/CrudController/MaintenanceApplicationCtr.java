@@ -77,31 +77,18 @@ public class MaintenanceApplicationCtr {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-        System.out.println("     " + str);
-
         RapidRecordType rapidRecordType = rapidRecordTypeRepo.findByTypeName(str);
-
-        System.out.println("     ddddd");
-
-        System.out.println("      " + rapidRecordType.getId());
-
         List<RapidRecordDetail> rapidRecordDetails = new ArrayList<RapidRecordDetail>();
-        System.out.println(rapidRecordDetails.size() + "       gggggggggg");
         rapidRecordDetails = rapidRecordDetailRepo.findByTypeId(rapidRecordType.getId());
-
-        System.out.println(rapidRecordDetails.size() + "       sssssssss");
         List<String> list = new ArrayList<String>();
-
         if (rapidRecordDetails.size() > 0) {
-            System.out.println("wojiushiwo " + rapidRecordDetails.size());
             for (int i = 0; i < rapidRecordDetails.size(); i++) {
                 list.add(rapidRecordDetails.get(i).getDetailName());
             }
             System.out.println(JSON.toJSONString(list));
             return JSON.toJSONString(list);
         } else {
-            System.out.println("else else selse ");
+            System.out.println("结果为空！");
             return "null";
         }
 
@@ -117,10 +104,7 @@ public class MaintenanceApplicationCtr {
     @RequestMapping(value = "postRepairApp", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String postRepairApp(@RequestBody String str) {
         try {
-            System.out.println("------------shi zhe de cuo wu  1-------------");
             str = URLDecoder.decode(str,"utf-8");
-            System.out.println(str);
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

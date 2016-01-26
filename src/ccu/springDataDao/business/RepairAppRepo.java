@@ -1,7 +1,9 @@
 package ccu.springDataDao.business;
 
 import ccu.model.business.RepairApp;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,7 +16,7 @@ import java.util.Set;
 /**
  * Created by Courage on 2015/10/23.
  */
-public interface RepairAppRepo extends CrudRepository<RepairApp,String>
+public interface RepairAppRepo extends CrudRepository<RepairApp,String>,JpaSpecificationExecutor<RepairApp>
 {
     public List<RepairApp> findByStep(int step);
 

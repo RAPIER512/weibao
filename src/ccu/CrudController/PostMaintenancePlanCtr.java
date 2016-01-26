@@ -1,10 +1,32 @@
 package ccu.CrudController;
 
-import ccu.model.basicData.AreaInfo;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import ccu.model.business.PlanExam;
 import ccu.model.business.RepairApp;
 import ccu.model.business.RepairPlan;
-import ccu.model.system.*;
+import ccu.model.system.UserInfo;
 import ccu.springDataDao.basicData.AreaInfoRepo;
 import ccu.springDataDao.business.PlanExamRepo;
 import ccu.springDataDao.business.RepairAppRepo;
@@ -12,21 +34,9 @@ import ccu.springDataDao.business.RepairPlanRepo;
 import ccu.springDataDao.system.RapidRecordDetailRepo;
 import ccu.springDataDao.system.RapidRecordTypeRepo;
 import ccu.springDataDao.system.UserInfoRepo;
-import ccu.springDataDao.system.UserReRoleRepo;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Courage on 2015/10/29.
@@ -88,19 +98,34 @@ public class PostMaintenancePlanCtr {
      */
     @RequestMapping(value = "getRepairApp1",method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
     public String getRepairApp1(@RequestBody String str ){
-
+    	int pageNum = 0;
+		int pageSize = 0;
         JSONObject jsonObject = JSON.parseObject(str);
+        pageNum = jsonObject.getIntValue("pageNum");
+        pageSize = jsonObject.getIntValue("pageSize");
+        final int step = jsonObject.getInteger("step");
         UserInfo userInfo = new UserInfo();
-        List<RepairApp> repairApp1 =new ArrayList<RepairApp>();
+        List<RepairApp> list =new ArrayList<RepairApp>();
         System.out.println(jsonObject.getString("userid")+"   " + jsonObject.getString("step"));
-        try {
-            userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
-            repairApp1 =repairAppRepo.findByRepairDepartmentIdAndStep(userInfo.getRepairDepartmentId(),jsonObject.getInteger("step"));
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(repairApp1.size()>=1)
-            return JSON.toJSONString(repairApp1);
+        userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
+        final String repairDepartmentId =  userInfo.getRepairDepartmentId();
+        Specification<RepairApp> specification = new Specification<RepairApp>() {
+			
+        	public Predicate toPredicate(Root<RepairApp> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				
+        		Path path = root.get("repairDepartmentId");
+        		Path path1 = root.get("step");
+				query.where(cb.equal(path, repairDepartmentId),cb.equal(path1, step));
+				return null;
+			}
+		};
+        Pageable pageable = new PageRequest(pageNum,pageSize);
+        
+        Page page =repairAppRepo.findAll(specification, pageable);
+        list = page.getContent();
+        if(list.size()>=1)
+            return JSON.toJSONString(list);
         else
             return "null";
     }
@@ -137,42 +162,31 @@ public class PostMaintenancePlanCtr {
     @RequestMapping(value = "getRepairApp3", method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
     public String getRepairApp3(@RequestBody String str)
     {
-//        JSONObject jsonObject = JSON.parseObject(str);
-//        UserInfo userInfo = userInfoRepo.findOne(jsonObject.getString("userid"));
-//        List<RepairApp> repairApps = new ArrayList<RepairApp>();
-//        List<AreaInfo> list = areaInfoRepo.findByAreaManageId(userInfo.getAreaManageId());
-//        for (int i =0;i<list.size();i++)
-//        {
-//            repairApps.addAll(repairAppRepo.findByAreaIdAndStep(list.get(i).getId(),jsonObject.getInteger("step")));
-//        }
-//        if(repairApps.size()>0)
-//            return JSON.toJSONString(repairApps);
-//        else
-//            return "null";
-
+    	int pageNum = 0;
+		int pageSize = 0;
         JSONObject jsonObject = JSON.parseObject(str);
-        List<RepairApp> repairApps = new ArrayList<RepairApp>();
-        repairApps = repairAppRepo.findByStep(jsonObject.getInteger("step"));
-        if(repairApps.size()>0)
-            return JSON.toJSONString(repairApps);
+        pageNum = jsonObject.getIntValue("pageNum");
+        pageSize = jsonObject.getIntValue("pageSize");
+        final int step = jsonObject.getInteger("step");
+        List<RepairApp> list = new ArrayList<RepairApp>();
+        Specification<RepairApp> specification = new Specification<RepairApp>() {
+			
+        	public Predicate toPredicate(Root<RepairApp> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+        		Path path = root.get("step");
+        		Predicate predicate =cb.equal(path, step);
+        		return predicate;
+        	}
+		};
+        Pageable pageable = new PageRequest(pageNum,pageSize);
+        Page page = repairAppRepo.findAll(specification, pageable);
+        list = page.getContent();
+        if(list.size()>0)
+            return JSON.toJSONString(list);
         else
             return "null";
     }
-    /**
-    *
-    * 根据类型名  查询  维修记录详细信息
-    *
-    * 输入数据：
-    * @param repairApp
-    * @return
-    */
-    @RequestMapping(value = "getRapidRecordDetail",method = RequestMethod.POST,produces = "text/plain;charset=UTF-8")
-    public String getRapidRecordDetail(@RequestBody String repairApp){
-        JSONObject jsonObject = JSON.parseObject(repairApp);
-        RapidRecordType rapidRecordType =rapidRecordTypeRepo.findByTypeName(jsonObject.getString("typeName"));
-        List<RapidRecordDetail> rapidRecordDetails =rapidRecordDetailRepo.findByTypeId(rapidRecordType.getId());
-        return JSON.toJSONString(rapidRecordDetails);
-    }
+     
     /**
      * 提交维保方案
      * 输入数据：维保方案相关信息对象
