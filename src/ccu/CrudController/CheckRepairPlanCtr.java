@@ -89,7 +89,6 @@ public class CheckRepairPlanCtr {
         Pageable pageable = new PageRequest(pageNum,pageSize);
         Page<RepairApp> page=repairAppRepo.findAll(specification,pageable);
         list = page.getContent();
-        list.get(0).setTheNextPage(page.hasNextPage());
         return JSON.toJSONString(list);
     }
 

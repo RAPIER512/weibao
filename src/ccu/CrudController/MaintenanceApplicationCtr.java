@@ -77,8 +77,10 @@ public class MaintenanceApplicationCtr {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        System.out.println("服务器接收的数据是:"+ str);
         RapidRecordType rapidRecordType = rapidRecordTypeRepo.findByTypeName(str);
         List<RapidRecordDetail> rapidRecordDetails = new ArrayList<RapidRecordDetail>();
+        System.out.println("rapidRecordType:"+rapidRecordType);
         rapidRecordDetails = rapidRecordDetailRepo.findByTypeId(rapidRecordType.getId());
         List<String> list = new ArrayList<String>();
         if (rapidRecordDetails.size() > 0) {

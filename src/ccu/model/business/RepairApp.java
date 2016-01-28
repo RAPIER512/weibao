@@ -116,8 +116,6 @@ public class RepairApp implements Serializable {
 //    @OneToMany(targetEntity = RepairPlan.class,fetch = FetchType.LAZY)
 //    private Set<RepairPlan> repairPlans = new HashSet<RepairPlan>();//所有方案
 
-    
-    private static boolean theNextPage;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -365,14 +363,5 @@ public class RepairApp implements Serializable {
     public void setPlanId(String planId) {
         this.planId = planId;
     }
-
-	public static boolean isTheNextPage() {
-		return theNextPage;
-	}
-
-	public static void setTheNextPage(boolean theNextPage) {
-		RepairApp.theNextPage = theNextPage;
-	}
-    
     
 }
